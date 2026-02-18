@@ -160,3 +160,104 @@ def dashboard(request):
             # Continuamos con los datos de Django si falla Firestore
     
     return render(request, 'dashboard.html', {'datos_usuario': datos_usuario})    
+
+@login_required_firebase
+def agendar_cita(request):
+    """
+    READ: Recuperar las citas del usuario desde firestore
+    """
+
+    uid = request.user.username
+
+    citas = []
+
+    try:
+        # Vamos a filtrar las citas del usuario
+        docs = db.collection('citas').where('usuario_id', '==', uid).stream()
+        for doc in docs:
+            cita = doc.to_dict()
+            cita['id'] = doc.id
+            citas.append(cita)
+    except Exception as e:
+        messages.error(request, f"Hubo un error al obtener las citas: {e}")
+    
+    return render(request, 'citas/listar.html', {'citas' : citas})
+
+@login_required_firebase # Verifica que el usuario esta loggeado
+def crear_cita(request):
+    """
+    CREATE: Reciben los datos desde el formulario y se almacenan
+    """
+    if (request.method == 'POST'):
+        titulo = request.POST.get('titulo')
+        descripcion = request.POST.get('descripcion')
+        uid = request.user.username  # Usa el email del usuario autenticado
+
+        try:
+            db.collection('citas').add({
+                'titulo': titulo,
+                'descripcion': descripcion,
+                'estado': 'Pendiente',
+                'usuario_id': uid,
+                'fecha_creacion': firestore.SERVER_TIMESTAMP
+            })
+            messages.success(request, "✅ Cita creada con éxito")
+            return redirect('agendar_cita')
+        except Exception as e:
+            messages.error(request, f"Error al crear la cita: {e}")
+        
+    return render(request, 'citas/form.html')
+
+@login_required_firebase # Verifica que el usuario esta loggeado
+def eliminar_cita(request, cita_id):
+    """
+    DELETE: Eliminar un documento especifico por id
+    """
+    try:
+        db.collection('citas').document(cita_id).delete()
+        messages.success(request, "🗑️ Cita eliminada.")
+    except Exception as e:
+        messages.error(request, f"Error al eliminar: {e}")
+
+    return redirect('agendar_cita')
+    
+@login_required_firebase # Verifica que el usuario esta loggeado
+def editar_cita(request, cita_id):
+    """
+    UPDATE: Recupera los datos de la cita especifica y actualiza los campos en firebase
+    """
+    uid = request.user.username
+   
+    cita_ref = db.collection('citas').document(cita_id)
+
+    try:
+        doc = cita_ref.get()
+        if not doc.exists:
+            messages.error(request, "La cita no existe")
+            return redirect('agendar_cita')
+        
+        cita_data = doc.to_dict()
+
+        if cita_data.get('usuario_id') != uid:
+            messages.error(request, "❌ No tienes permiso para editar esta cita")
+            return redirect('agendar_cita')
+        
+        if request.method == 'POST':
+            nuevo_titulo = request.POST.get('titulo')
+            nueva_desc = request.POST.get('descripcion')
+            nuevo_estado = request.POST.get('estado')
+
+            cita_ref.update({
+                'titulo': nuevo_titulo,
+                'descripcion': nueva_desc,
+                'estado': nuevo_estado,
+                'fecha_actualizacion': firestore.SERVER_TIMESTAMP
+            })
+
+            messages.success(request, "✅ Cita actualizada correctamente.")
+            return redirect('agendar_cita')
+    except Exception as e:
+        messages.error(request, f"Error al editar la cita: {e}")
+        return redirect('agendar_cita')
+    
+    return render(request, 'citas/editar.html', {'cita': cita_data, 'id': cita_id})
