@@ -270,12 +270,18 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            text-decoration: none;
         }
 
-        .action-btn:hover {
+        .action-btn:hover:not(:disabled) {
             background: #ffed4e;
             box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
             transform: translateY(-2px);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .action-btn i {
@@ -491,16 +497,19 @@
         <div class="actions-section">
             <div class="actions-title"><i class="fas fa-tasks"></i> Gestión</div>
             <div class="action-buttons">
-                <button class="action-btn" title="Próximamente">
-                    <i class="fas fa-calendar-check"></i> Agendar Cita
-                </button>
-                <button class="action-btn" title="Próximamente">
+                <a href="{% url 'agendar_cita' %}" class="action-btn" title="Gestiona tus citas">
+                    <i class="fas fa-calendar-check"></i> Mis Citas
+                </a>
+                <a href="{% url 'crear_cita' %}" class="action-btn" title="Agenda una nueva cita">
+                    <i class="fas fa-plus-circle"></i> Nueva Cita
+                </a>
+                <button class="action-btn" title="Próximamente" disabled style="opacity: 0.5; cursor: not-allowed;">
                     <i class="fas fa-images"></i> Mi Galería
                 </button>
-                <button class="action-btn" title="Próximamente">
+                <button class="action-btn" title="Próximamente" disabled style="opacity: 0.5; cursor: not-allowed;">
                     <i class="fas fa-user-edit"></i> Editar Perfil
                 </button>
-                <button class="action-btn" title="Próximamente">
+                <button class="action-btn" title="Próximamente" disabled style="opacity: 0.5; cursor: not-allowed;">
                     <i class="fas fa-cog"></i> Configuración
                 </button>
             </div>
