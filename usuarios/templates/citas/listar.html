@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Citas - Studio Tattoo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #0f0f0f;
+            border-bottom: 2px solid #ffd700;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 28px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #ffd700;
+            font-size: 14px;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* CONTAINER PRINCIPAL */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .breadcrumb a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: #ffed4e;
+        }
+
+        /* HEADER */
+        .page-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-left p {
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        .header-action {
+            margin-top: 0;
+        }
+
+        /* ACTION BUTTON */
+        .btn-new {
+            background: #ffd700;
+            color: #0f0f0f;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-new:hover {
+            background: #ffed4e;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* MESSAGES */
+        .messages {
+            margin-bottom: 25px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: #f44336;
+            color: #ff8a80;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4caf50;
+            color: #81c784;
+        }
+
+        /* CITAS TABLE */
+        .citas-container {
+            background: #0f0f0f;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .citas-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .citas-table thead {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-bottom: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .citas-table th {
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #ffd700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .citas-table tbody tr {
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .citas-table tbody tr:hover {
+            background-color: rgba(255, 215, 0, 0.05);
+        }
+
+        .citas-table td {
+            padding: 20px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .cita-titulo {
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .cita-descripcion {
+            color: #bbb;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-pendiente {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffd700;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .badge-confirmada {
+            background: rgba(33, 150, 243, 0.2);
+            color: #42a5f5;
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+
+        .badge-completada {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .badge-cancelada {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ff8a80;
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .btn-edit {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: rgba(255, 215, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            color: #bbb;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* FOOTER */
+        .dashboard-footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            margin-top: 60px;
+        }
+
+        .dashboard-footer a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .dashboard-footer a:hover {
+            color: #ffed4e;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+                text-align: center;
+            }
+
+            .navbar-user {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .header-left h1 {
+                font-size: 24px;
+            }
+
+            .citas-table {
+                font-size: 12px;
+            }
+
+            .citas-table th,
+            .citas-table td {
+                padding: 15px 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR: Barra superior con logo, datos del usuario y botón de logout -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-skull"></i>
+            STUDIO TATTOO
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-name">{{ user.first_name }}</div>
+                <div class="user-email">{{ user.email }}</div>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL: Sección con navegación, encabezado y listado de citas -->
+    <div class="container">
+        
+        <!-- BREADCRUMB: Ruta de navegación para facilitar orientación (Dashboard > Mis Citas) -->
+        <div class="breadcrumb">
+            <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+            <span>/</span>
+            <span style="color: #ffd700;"><i class="fas fa-calendar"></i> Mis Citas</span>
+        </div>
+
+        <!-- MESSAGES: Muestra mensajes de éxito/error desde las vistas (crear, editar, eliminar cita) -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {% if message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                {% endif %}
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- PAGE HEADER: Encabezado con título "Mis Citas" y botón para crear nueva cita -->
+        <div class="page-header">
+            <div class="header-left">
+                <h1><i class="fas fa-calendar-check"></i> Mis Citas</h1>
+                <p>Gestiona todas tus citas y tatuajes</p>
+            </div>
+            <div class="header-action">
+                <a href="{% url 'crear_cita' %}" class="btn-new">
+                    <i class="fas fa-plus-circle"></i> Nueva Cita
+                </a>
+            </div>
+        </div>
+
+        <!-- CITAS LIST: Verifica si hay citas para mostrar tabla o estado vacío -->
+        {% if citas %}
+        <!-- TABLA DE CITAS: Muestra todas las citas del usuario recuperadas desde Firebase en agendar_cita() -->
+        <div class="citas-container">
+            <table class="citas-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- FILAS: Itera sobre cada cita y muestra sus datos en una fila de la tabla -->
+                    {% for cita in citas %}
+                    <tr>
+                        <!-- TÍTULO: Muestra el título de la cita almacenado en Firebase -->
+                        <td>
+                            <div class="cita-titulo">{{ cita.titulo }}</div>
+                        </td>
+                        <!-- DESCRIPCIÓN: Muestra la descripción (truncada si es muy larga) -->
+                        <td>
+                            <div class="cita-descripcion">
+                                {% if cita.descripcion|length > 100 %}
+                                    {{ cita.descripcion|truncatewords:15 }}
+                                {% else %}
+                                    {{ cita.descripcion }}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <!-- ESTADO: Badge con color según el estado de la cita (Pendiente, Confirmada, Completada, Cancelada) -->
+                        <td>
+                            {% if cita.estado == 'Pendiente' %}
+                                <span class="badge badge-pendiente">
+                                    <i class="fas fa-clock"></i> {{ cita.estado }}
+                                </span>
+                            {% elif cita.estado == 'Confirmada' %}
+                                <span class="badge badge-confirmada">
+                                    <i class="fas fa-check"></i> {{ cita.estado }}
+                                </span>
+                            {% elif cita.estado == 'Completada' %}
+                                <span class="badge badge-completada">
+                                    <i class="fas fa-check-double"></i> {{ cita.estado }}
+                                </span>
+                            {% elif cita.estado == 'Cancelada' %}
+                                <span class="badge badge-cancelada">
+                                    <i class="fas fa-ban"></i> {{ cita.estado }}
+                                </span>
+                            {% endif %}
+                        </td>
+                        <!-- ACCIONES: Botones para editar (editar_cita) o eliminar (eliminar_cita) la cita -->
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'editar_cita' cita.id %}" class="btn-action btn-edit">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a href="{% url 'eliminar_cita' cita.id %}" class="btn-action btn-delete" onclick="return confirm('¿Estás seguro de que deseas eliminar esta cita?');">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <!-- SI NO HAY CITAS: Muestra estado vacío con invitación a crear primera cita -->
+        <div class="citas-container">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h2>No tienes citas agendadas</h2>
+                <p>Comienza a agendar tus citas en Studio Tattoo</p>
+                <a href="{% url 'crear_cita' %}" class="btn-new">
+                    <i class="fas fa-plus-circle"></i> Agendar Primera Cita
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- FOOTER: Pie de página con información y derechos de autor -->
+    <div class="dashboard-footer">
+        <p>&copy; 2026 Studio Tattoo. Todos los derechos reservados.</p>
+        <p>Para soporte, contacta con nosotros en <a href="#">support@studiotattoo.com</a></p>
+    </div>
+
+</body>
+</html>
